@@ -1,4 +1,4 @@
-# 📸 Custom Camera App Readme
+# 📸 Custom Camera App
 
 This Custom Camera App utilizes the CameraX API provided by Android Jetpack to record videos with various functionalities. Below is an overview of its current features:
 

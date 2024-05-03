@@ -6,4 +6,5 @@
     <color name="grayWhite">#CAC5C5</color>
     <color name="customTransparent">#41424242</color>
     <color name="yellow">#EDBE01</color>
+    <color name="transparentGray">#C4595959</color>
 </resources>

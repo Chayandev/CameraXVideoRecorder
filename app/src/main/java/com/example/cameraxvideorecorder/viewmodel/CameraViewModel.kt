@@ -1,18 +1,23 @@
-package com.example.cameraxvideorecorder
+package com.example.cameraxvideorecorder.viewmodel
 
 import android.content.ContentValues
-import android.content.ContentValues.TAG
 import android.content.Context
+import android.hardware.camera2.CameraCharacteristics
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.OptIn
+import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.Camera
 import androidx.lifecycle.ViewModel
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.FallbackStrategy
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
@@ -34,9 +39,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-//interface UseCaseExecutionListener {
-//    fun onUseCaseExecutedSuccessfully()
-//}
+
+interface UseCaseExecutionListener {
+    fun onUseCaseExecutedSuccessfully()
+}
 
 class CameraViewModel : ViewModel() {
     private var imageCapture: ImageCapture? = null
@@ -50,8 +56,10 @@ class CameraViewModel : ViewModel() {
     var cameraLensFacing = CameraSelector.LENS_FACING_BACK
     var rotationDegrees = 0f
 
-    private val _isVideoCapturing=MutableLiveData(false)
-    var isVideoCapturing :LiveData<Boolean> =_isVideoCapturing
+    var resolutionQuality: Quality = Quality.SD
+
+    private val _isVideoCapturing = MutableLiveData(false)
+    var isVideoCapturing: LiveData<Boolean> = _isVideoCapturing
 
     private var cameraExecutorJob: Job? = null
     private val cameraScope = CoroutineScope(Dispatchers.Default)
@@ -62,10 +70,14 @@ class CameraViewModel : ViewModel() {
     private val _toastMessage = MutableLiveData<String?>()
     val toastMessage: LiveData<String?> = _toastMessage
 
-//    private var useCaseExecutionListener: UseCaseExecutionListener? = null
-//    fun setUseCaseExecutionListener(listener: UseCaseExecutionListener) {
-//        useCaseExecutionListener = listener
-//    }
+    private val _recordingTime = MutableLiveData<Long>()
+    val recordingTime: LiveData<Long> = _recordingTime
+
+    private var useCaseExecutionListener: UseCaseExecutionListener? = null
+    fun setUseCaseExecutionListener(listener: UseCaseExecutionListener) {
+        useCaseExecutionListener = listener
+    }
+
     fun startCamera(
         viewSurfaceProvider: Preview.SurfaceProvider,
         context: Context,
@@ -74,6 +86,7 @@ class CameraViewModel : ViewModel() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
+          //  getSupportedResolutionQuality()
             bindCameraUserCases(viewSurfaceProvider, lifecycleOwner)
         }, ContextCompat.getMainExecutor(context))
 
@@ -83,6 +96,7 @@ class CameraViewModel : ViewModel() {
         }
     }
 
+    @OptIn(ExperimentalCamera2Interop::class)
     fun bindCameraUserCases(
         viewSurfaceProvider: Preview.SurfaceProvider,
         lifecycleOwner: LifecycleOwner
@@ -91,15 +105,10 @@ class CameraViewModel : ViewModel() {
         val preview = Preview.Builder().build().apply {
             setSurfaceProvider(viewSurfaceProvider)
         }
-
         // Recorder
+        val qualitySelector = QualitySelector.from(resolutionQuality)
         val recorder = Recorder.Builder()
-            .setQualitySelector(
-                QualitySelector.from(
-                    Quality.HIGHEST,
-                    FallbackStrategy.higherQualityOrLowerThan(Quality.SD)
-                )
-            )
+            .setQualitySelector(qualitySelector)
             .build()
         videoCapture = VideoCapture.withOutput(recorder)
 
@@ -119,24 +128,25 @@ class CameraViewModel : ViewModel() {
                 videoCapture
             )
             // Notify the listener that the use case has been executed successfully
-            //useCaseExecutionListener?.onUseCaseExecutedSuccessfully()
+            useCaseExecutionListener?.onUseCaseExecutedSuccessfully()
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
     }
 
     fun captureVideo(context: Context) {
-        _isVideoCapturing.value=true
+        _isVideoCapturing.value = true
         val videoCapture = this.videoCapture ?: return
         _videoCaptureButtonEnabled.value = false
 
-//        val curRecording = recording
-//        if (curRecording != null) {
-//            curRecording.stop()
-//            recording = null
-//            return
-//        }
-
+        val curRecording = recording
+        if (curRecording != null) {
+            curRecording.stop()
+            stopRecording()
+            recording = null
+            return
+        }
+        startRecording()
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
@@ -170,6 +180,7 @@ class CameraViewModel : ViewModel() {
                         is VideoRecordEvent.Start -> {
                             _videoCaptureButtonEnabled.postValue(true)
                         }
+
                         is VideoRecordEvent.Finalize -> {
                             if (!recordEvent.hasError()) {
                                 val msg =
@@ -183,7 +194,7 @@ class CameraViewModel : ViewModel() {
                                 _toastMessage.postValue(errorMsg)
                                 Log.e(TAG, errorMsg)
                             }
-                            _isVideoCapturing.value=false
+                            _isVideoCapturing.value = false
                             _videoCaptureButtonEnabled.postValue(true)
                         }
                     }
@@ -191,6 +202,24 @@ class CameraViewModel : ViewModel() {
         }
     }
 
+    fun checkSupportedResolutionQuality(quality: Quality): Boolean {
+        if (getSupportedResolutionQuality().contains(quality)) {
+            resolutionQuality = quality
+            return true
+        }
+        return false
+    }
+
+    @OptIn(ExperimentalCamera2Interop::class)
+    private fun getSupportedResolutionQuality(): List<Quality> {
+        val cameraInfo = cameraProvider.availableCameraInfos.filter { info ->
+            Camera2CameraInfo.from(info)
+                .getCameraCharacteristic(CameraCharacteristics.LENS_FACING) == cameraLensFacing
+        }
+        val supportedQualities = QualitySelector.getSupportedQualities(cameraInfo[0])
+        Log.d("qalities", supportedQualities.toString())
+        return supportedQualities
+    }
 
     fun releaseCamera() {
         cameraProvider.unbindAll()
@@ -208,6 +237,37 @@ class CameraViewModel : ViewModel() {
     fun updateRotationDegree(rotation: Float) {
         rotationDegrees += rotation
     }
+
+    fun zoomEffect(value: Float) {
+        camera.cameraControl.setLinearZoom(value / 100.toFloat())
+    }
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val updateTimer = object : Runnable {
+        override fun run() {
+            val currentTime = SystemClock.elapsedRealtime() - recordingStartTime
+            _recordingTime.value = currentTime
+            handler.postDelayed(this, 1000)
+        }
+    }
+
+    private var recordingStartTime: Long = 0
+
+    fun startRecording() {
+        recordingStartTime = SystemClock.elapsedRealtime()
+        handler.post(updateTimer)
+    }
+
+    fun stopRecording() {
+        handler.removeCallbacks(updateTimer)
+    }
+    fun pauseHandler(context: Context) {
+        if (recording != null) {
+            recording?.stop()
+            captureVideo(context)
+        }
+    }
+
 
     companion object {
         private const val TAG = "CameraViewModel"

@@ -16,6 +16,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.example.cameraxvideorecorder.util.FocusSquareView
+        android:id="@+id/focusSquareView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.slider.Slider
         android:id="@+id/zoomSlider"
         android:layout_width="0dp"
@@ -23,14 +32,17 @@
         android:contentDescription="@string/zoomslider"
         android:valueFrom="0.0"
         android:valueTo="100.0"
-        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottomView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_percent="0.8"
         app:thumbColor="@color/yellow"
         app:trackColorActive="@color/yellow"
-        app:trackColorInactive="@color/grayWhite" />
+        app:trackColorInactive="@color/grayWhite"
+        app:tickColorActive="@color/yellow"
+        app:thumbStrokeColor="@color/yellow"
+        app:haloColor="@color/yellow"
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomView"
@@ -42,12 +54,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <Button
+        <ImageButton
             android:id="@+id/video_capture_button"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_gravity="center"
             android:background="@drawable/rounded_shape"
+            android:contentDescription="@string/videocapturebtn"
             app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,13 +89,51 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topView"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="0dp"
         android:background="@color/black"
+        android:minHeight="100dp"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/qualitySelectorLL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounder_corner_gray_shape"
+            android:baselineAligned="false"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="4dp"
+            android:weightSum="4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <include
+                android:id="@+id/quality480PLL"
+                layout="@layout/quality_item_layout" />
+
+            <include
+                android:id="@+id/quality720PLL"
+                layout="@layout/quality_item_layout" />
+
+            <include
+                android:id="@+id/quality1080PLL"
+                layout="@layout/quality_item_layout" />
+
+            <include
+                android:id="@+id/quality2160PLL"
+                layout="@layout/quality_item_layout" />
+
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/flashButton"
@@ -94,7 +145,47 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_flash_off"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/qualitySelectorLL" />
+
+        <ImageButton
+            android:id="@+id/timerIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:padding="16dp"
+            android:src="@drawable/ic_timmer"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/qualitySelectorLL"
+            android:contentDescription="@string/timmericon" />
+
+        <LinearLayout
+            android:id="@+id/timerView_LL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/qualitySelectorLL">
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/red_dot_shape" />
+
+            <Chronometer
+                android:id="@+id/timerView"
+                android:layout_width="53dp"
+                android:layout_height="wrap_content"
+                android:text="@string/_90_00"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.example.caremaxvideorecorder
+package com.example.cameraxvideorecorder
 
 import org.junit.Test
 

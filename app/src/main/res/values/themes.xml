@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.CaremaXVideoRecorder" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.CameraXVideoRecorder" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">
@@ -11,5 +11,5 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.CaremaXVideoRecorder" parent="Base.Theme.CaremaXVideoRecorder" />
+    <style name="Theme.CameraXVideoRecorder" parent="Base.Theme.CameraXVideoRecorder" />
 </resources>

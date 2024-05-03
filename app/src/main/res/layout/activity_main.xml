@@ -16,7 +16,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.slider.Slider
+        android:id="@+id/zoomSlider"
+        android:layout_width="0dp"
+        android:layout_height="16dp"
+        android:contentDescription="@string/zoomslider"
+        android:valueFrom="0.0"
+        android:valueTo="100.0"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottomView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.8"
+        app:thumbColor="@color/yellow"
+        app:trackColorActive="@color/yellow"
+        app:trackColorInactive="@color/grayWhite" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -72,8 +89,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:padding="16dp"
             android:contentDescription="@string/flash_icon"
+            android:padding="16dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_flash_off"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.caremaxvideorecorder"
+    namespace = "com.example.cameraxvideorecorder"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.caremaxvideorecorder"
+        applicationId = "com.example.cameraxvideorecorder"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -62,4 +62,6 @@ dependencies {
     implementation(libs.androidx.camera.mlkit.vision)
     // If you want to additionally use the CameraX Extensions library
     implementation(libs.androidx.camera.extensions)
+
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
 }

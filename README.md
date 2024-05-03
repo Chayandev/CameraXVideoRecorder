@@ -10,7 +10,7 @@ This Custom Camera App utilizes the CameraX API provided by Android Jetpack to r
 4. ⏱️ **Real-time Timer**: Display a timer indicating the duration of the ongoing recording.
 5. 🔍 **Manual Zoom**: Zoom in or out manually while recording videos.
 6. 🔍 **Manual Focus**: Adjust the focus manually with a square focus indicator.
-7. 💾 **Save to Device Gallery**: Videos recorded with the app are automatically saved to the device gallery.
+7. 💾 **Automatic Recording Save**: Stop video recording will automatically save the recording to the device gallery.
 8. 💻 **User Interface**: Designed with a user-friendly interface for smooth interaction.
 
 ## Tech Stack:
@@ -41,7 +41,7 @@ This Custom Camera App utilizes the CameraX API provided by Android Jetpack to r
 7. Adjust focus manually by tapping on the desired area on the screen where you want to focus. A square focus indicator will appear to assist with focusing.
 8. Start recording by tapping the record button.
 9. The timer will display the duration of the recording in real-time.
-10. Once recording is complete, the video will be saved to the device gallery.
+10. Once recording is complete, the video will be automatically saved to the device gallery.
 
 ## APK Download:
 

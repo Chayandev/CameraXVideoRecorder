@@ -63,5 +63,5 @@ https://github.com/Chayandev/CameraXVideoRecorder/assets/91884990/00e15048-2ede-
 
 You can download the latest version of the app from the following link:
 
-[Download APK](link_to_attach)
+[Download APK](https://github.com/Chayandev/CameraXVideoRecorder/releases/download/1.0/app-release.apk)
 

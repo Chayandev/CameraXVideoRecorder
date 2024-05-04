@@ -56,7 +56,6 @@ class CameraViewModel : ViewModel() {
     var cameraLensFacing = CameraSelector.LENS_FACING_BACK
     var rotationDegrees = 0f
 
-    var resolutionQuality: Quality = Quality.SD
 
     private val _isVideoCapturing = MutableLiveData(false)
     var isVideoCapturing: LiveData<Boolean> = _isVideoCapturing
@@ -73,6 +72,9 @@ class CameraViewModel : ViewModel() {
     private val _recordingTime = MutableLiveData<Long>()
     val recordingTime: LiveData<Long> = _recordingTime
 
+    private val _resolutionQuality = MutableLiveData<Quality>(Quality.SD)
+    val resolutionQuality: LiveData<Quality> = _resolutionQuality
+
     private var useCaseExecutionListener: UseCaseExecutionListener? = null
     fun setUseCaseExecutionListener(listener: UseCaseExecutionListener) {
         useCaseExecutionListener = listener
@@ -86,7 +88,7 @@ class CameraViewModel : ViewModel() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
-          //  getSupportedResolutionQuality()
+            _resolutionQuality.value = getSupportedResolutionQuality()[0]
             bindCameraUserCases(viewSurfaceProvider, lifecycleOwner)
         }, ContextCompat.getMainExecutor(context))
 
@@ -106,11 +108,13 @@ class CameraViewModel : ViewModel() {
             setSurfaceProvider(viewSurfaceProvider)
         }
         // Recorder
-        val qualitySelector = QualitySelector.from(resolutionQuality)
-        val recorder = Recorder.Builder()
-            .setQualitySelector(qualitySelector)
-            .build()
-        videoCapture = VideoCapture.withOutput(recorder)
+        val qualitySelector = resolutionQuality.value?.let { QualitySelector.from(it) }
+        val recorder = qualitySelector?.let {
+            Recorder.Builder()
+                .setQualitySelector(it)
+                .build()
+        }
+        videoCapture = recorder?.let { VideoCapture.withOutput(it) }
 
         cameraSelector = CameraSelector.Builder()
             .requireLensFacing(cameraLensFacing)
@@ -204,8 +208,10 @@ class CameraViewModel : ViewModel() {
 
     fun checkSupportedResolutionQuality(quality: Quality): Boolean {
         if (getSupportedResolutionQuality().contains(quality)) {
-            resolutionQuality = quality
+            _resolutionQuality.value = quality
             return true
+        }else{
+            _toastMessage.postValue("This Quality Doesn't support by this device")
         }
         return false
     }
@@ -253,19 +259,24 @@ class CameraViewModel : ViewModel() {
 
     private var recordingStartTime: Long = 0
 
-    fun startRecording() {
+    private fun startRecording() {
         recordingStartTime = SystemClock.elapsedRealtime()
         handler.post(updateTimer)
     }
 
-    fun stopRecording() {
+    private fun stopRecording() {
         handler.removeCallbacks(updateTimer)
     }
+
     fun pauseHandler(context: Context) {
         if (recording != null) {
             recording?.stop()
             captureVideo(context)
         }
+    }
+
+    fun setDefaultResolution() {
+        _resolutionQuality.value = getSupportedResolutionQuality()[0]
     }
 
 

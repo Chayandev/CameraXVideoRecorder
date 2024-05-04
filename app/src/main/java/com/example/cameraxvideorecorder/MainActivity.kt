@@ -19,7 +19,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.Observer
 import com.example.cameraxvideorecorder.databinding.ActivityMainBinding
 import com.example.cameraxvideorecorder.databinding.QualityItemLayoutBinding
 import com.example.cameraxvideorecorder.viewmodel.CameraViewModel
@@ -86,6 +85,7 @@ class MainActivity(private val viewModel: CameraViewModel = CameraViewModel()) :
                 viewBinding.viewFinder.surfaceProvider,
                 this
             )
+            viewModel.setDefaultResolution()
         }
         viewBinding.videoCaptureButton.setOnClickListener {
             viewModel.captureVideo(this)
@@ -122,7 +122,7 @@ class MainActivity(private val viewModel: CameraViewModel = CameraViewModel()) :
         }
 
         //Observe isVideoCapturing LiveData to change the Button UI
-        viewModel.isVideoCapturing.observe(this, Observer { isCapturing ->
+        viewModel.isVideoCapturing.observe(this) { isCapturing ->
             if (isCapturing) {
                 viewBinding.qualitySelectorLL.visibility = View.GONE
                 viewBinding.zoomSlider.visibility = View.VISIBLE
@@ -143,21 +143,26 @@ class MainActivity(private val viewModel: CameraViewModel = CameraViewModel()) :
                 viewBinding.timerIcon.visibility = View.VISIBLE
                 viewBinding.timerViewLL.visibility = View.GONE
             }
-        })
+        }
         // Observe videoCaptureButtonEnabled LiveData to enable/disable the video capture button
-        viewModel.videoCaptureButtonEnabled.observe(this, Observer { enabled ->
+        viewModel.videoCaptureButtonEnabled.observe(this) { enabled ->
             viewBinding.videoCaptureButton.isEnabled = enabled
-        })
+        }
 
         // Observe toastMessage LiveData to show Toast messages
-        viewModel.toastMessage.observe(this, Observer { message ->
+        viewModel.toastMessage.observe(this) { message ->
             message?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
-        })
+        }
         viewModel.recordingTime.observe(this) { time ->
             updateRecordingTime(time)
         }
+
+        viewModel.resolutionQuality.observe(this) { quality ->
+            setUpResolutionOnChange(quality)
+        }
+
     }
 
     private fun setupFlash() {
@@ -243,8 +248,6 @@ class MainActivity(private val viewModel: CameraViewModel = CameraViewModel()) :
     private fun setTheDefaultUi() {
         //setDefaultFlash
         viewBinding.flashButton.setImageResource(R.drawable.ic_flash_off)
-        //setDefault resolution
-        viewModel.resolutionQuality = Quality.SD
         //setupUI
         selectedQualityItem = viewBinding.quality480PLL
         viewBinding.quality480PLL.qualityItemLl.setBackgroundResource(R.drawable.rounded_corner_yellow_shape)
@@ -288,30 +291,46 @@ class MainActivity(private val viewModel: CameraViewModel = CameraViewModel()) :
 
     private fun onItemClicked(item: QualityItemLayoutBinding, quality: Quality) {
         Log.d("clickedQuality", quality.toString())
-        if (viewModel.checkSupportedResolutionQuality(quality)) {
-            // Reset the background of the previously selected item (if any)
-            selectedQualityItem?.qualityItemLl?.background = null
-            selectedQualityItem?.pixelText?.apply {
-                setTextColor(ContextCompat.getColor(context, R.color.white))
-            }
-            selectedQualityItem?.subDetail?.apply {
-                setTextColor(ContextCompat.getColor(context, R.color.white))
-            }
-            // Update the background of the clicked item
-            selectedQualityItem = item
-            item.qualityItemLl.setBackgroundResource(R.drawable.rounded_corner_yellow_shape)
-            item.pixelText.apply {
-                setTextColor(ContextCompat.getColor(context, R.color.black))
-            }
-            item.subDetail.apply {
-                setTextColor(ContextCompat.getColor(context, R.color.black))
-            }
-            viewModel.bindCameraUserCases(viewBinding.viewFinder.surfaceProvider, this)
-        } else {
-            Toast.makeText(this, "This Resolution doesn't support in this device", Toast.LENGTH_SHORT)
-                .show()
-        }
+        viewBinding.flashButton.setImageResource(R.drawable.ic_flash_off)
+        viewModel.checkSupportedResolutionQuality(quality)
+    }
 
+    private fun setUpResolutionOnChange(quality: Quality) {
+        val item = when (quality) {
+            Quality.SD -> {
+                viewBinding.quality480PLL
+            }
+
+            Quality.HD -> {
+                viewBinding.quality720PLL
+            }
+
+            Quality.FHD -> {
+                viewBinding.quality1080PLL
+            }
+
+            else -> {
+                viewBinding.quality2160PLL
+            }
+        }
+        // Reset the background of the previously selected item (if any)
+        selectedQualityItem?.qualityItemLl?.background = null
+        selectedQualityItem?.pixelText?.apply {
+            setTextColor(ContextCompat.getColor(context, R.color.white))
+        }
+        selectedQualityItem?.subDetail?.apply {
+            setTextColor(ContextCompat.getColor(context, R.color.white))
+        }
+        // Update the background of the clicked item
+        selectedQualityItem = item
+        item.qualityItemLl.setBackgroundResource(R.drawable.rounded_corner_yellow_shape)
+        item.pixelText.apply {
+            setTextColor(ContextCompat.getColor(context, R.color.black))
+        }
+        item.subDetail.apply {
+            setTextColor(ContextCompat.getColor(context, R.color.black))
+        }
+        viewModel.bindCameraUserCases(viewBinding.viewFinder.surfaceProvider, this)
     }
 
     private fun updateRecordingTime(time: Long) {

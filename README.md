@@ -5,7 +5,7 @@ This Custom Camera App utilizes the CameraX API provided by Android Jetpack to r
 ## Features:
 
 1. 🔦 **Flash Toggle**: Enable or disable flash to record videos with light.
-2. 🎥 **Quality Selection**: Choose the resolution quality for recording videos.
+2. 🎥 **Quality Selection**: Choose the resolution quality supported by device for recording videos.
 3. 🔄 **Flip Camera**: Switch between front and back cameras seamlessly.
 4. ⏱️ **Real-time Timer**: Display a timer indicating the duration of the ongoing recording.
 5. 🔍 **Manual Zoom**: Zoom in or out manually while recording videos.
@@ -35,7 +35,7 @@ This Custom Camera App utilizes the CameraX API provided by Android Jetpack to r
 1. Launch the app on your Android device.
 2. Grant necessary permissions for camera and storage access if prompted.
 3. Use the flash toggle to enable or disable flash as needed.
-4. Select the desired quality for recording videos.
+4. Select the desired quality supported by device for recording videos.
 5. Flip the camera to switch between front and back cameras.
 6. Use slider for manual zooming during video recording.
 7. Adjust focus manually by tapping on the desired area on the screen where you want to focus. A square focus indicator will appear to assist with focusing.

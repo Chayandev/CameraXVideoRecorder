@@ -22,7 +22,23 @@ This Custom Camera App utilizes the CameraX API provided by Android Jetpack to r
   
 ## Screenshots:
 
-*screenshots*
+### Initial UI (defalut Preview)
+
+<img src="https://github.com/Chayandev/CameraXVideoRecorder/assets/91884990/0ca61a94-e40e-4e7c-bca9-f16e670627b7" width="300" height="650">
+
+### Preview with flash on
+
+<img src="https://github.com/Chayandev/CameraXVideoRecorder/assets/91884990/be808668-9d75-4dc4-a1fd-ffce34b964fe" width="300" height="650">
+
+### Preview with on touch focus
+<img src="https://github.com/Chayandev/CameraXVideoRecorder/assets/91884990/657bbeb9-84ea-4870-bb62-1ce4dac02a10" width="300" height="650">
+
+### Recording Video with Zoom Slider
+<img src="https://github.com/Chayandev/CameraXVideoRecorder/assets/91884990/f39cd9bc-0cf3-48f1-9ef2-c04518773ea3" width="300" height="650">
+
+### Demo Video of the App
+
+https://github.com/Chayandev/CameraXVideoRecorder/assets/91884990/00e15048-2ede-42fb-ab1f-8519979fc52c
 
 ## Installation:
 

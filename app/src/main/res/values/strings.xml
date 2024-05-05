@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="flipcameraicon">flipCameraIcon</string>
+    <string name="flash_icon">flash_icon</string>
+    <string name="zoomslider">zoomSlider</string>
+    <string name="_90_00">90:00</string>
+    <string name="_480p">480P</string>
+    <string name="sd">SD</string>
+    <string name="_720p">720P</string>
+    <string name="HD">HD</string>
+    <string name="_1080p">1080P</string>
+    <string name="FHD">FHD</string>
+    <string name="_2160p">2160P</string>
+    <string name="UHD">UHD</string>
+    <string name="videocapturebtn">videoCaptureBtn</string>
+    <string name="timmericon">timmerIcon</string>
+</resources>

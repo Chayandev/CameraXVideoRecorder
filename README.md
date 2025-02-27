@@ -1,4 +1,4 @@
-# 📸 Custom Camera App
+![CameraXVideoRecorder](https://socialify.git.ci/Chayandev/CameraXVideoRecorder/image?font=Inter&language=1&name=1&owner=1&theme=Light)
 
 This Custom Camera App utilizes the CameraX API provided by Android Jetpack to record videos with various functionalities. Below is an overview of its current features:
 
